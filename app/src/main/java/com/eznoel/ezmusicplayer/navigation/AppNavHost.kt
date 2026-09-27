@@ -8,7 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.eznoel.ezmusicplayer.feature.library.FilesScreen
+import com.eznoel.ezmusicplayer.feature.files.FolderConfigScreen
+import com.eznoel.ezmusicplayer.feature.files.FilesScreen
 import com.eznoel.ezmusicplayer.feature.library.LibraryScreen
 import com.eznoel.ezmusicplayer.feature.library.PlaylistsScreen
 import com.eznoel.ezmusicplayer.feature.library.SettingsScreen
@@ -26,7 +27,16 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
     ) {
         composable<LibraryRoute> { LibraryScreen() }
         composable<PlaylistsRoute> { PlaylistsScreen() }
-        composable<FilesRoute> { FilesScreen() }
+        composable<FilesRoute> {
+            FilesScreen(
+                onNavigateToFolderConfig = { navController.navigate(FolderConfigRoute) }
+            )
+        }
+        composable<FolderConfigRoute> {
+            FolderConfigScreen(
+                onBackClick = { navController.navigateUp() }
+            )
+        }
         composable<SettingsRoute> { SettingsScreen() }
     }
 }

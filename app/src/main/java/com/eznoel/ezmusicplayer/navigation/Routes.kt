@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object LibraryRoute
 @Serializable data object PlaylistsRoute
 @Serializable data object FilesRoute
+@Serializable data object FolderConfigRoute
 @Serializable data object SettingsRoute
 
 enum class TopLevelDestination(

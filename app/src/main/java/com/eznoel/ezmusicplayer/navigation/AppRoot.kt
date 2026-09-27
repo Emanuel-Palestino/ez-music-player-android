@@ -1,6 +1,7 @@
 package com.eznoel.ezmusicplayer.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -24,27 +25,34 @@ fun AppRoot() {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
+    val isTopLevelDestination = TopLevelDestination.entries.any { dest ->
+        currentDestination?.hierarchy?.any { it.hasRoute(dest.route::class) } == true
+    }
+
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            Column {
-                // MiniPlayer
-                NavigationBar {
-                    TopLevelDestination.entries.forEach { dest ->
-                        NavigationBarItem(
-                            selected = currentDestination?.hierarchy
-                                ?.any { it.hasRoute(dest.route::class) } == true,
-                            onClick = {
-                                navController.navigate(dest.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+            if (isTopLevelDestination) {
+                Column {
+                    // MiniPlayer
+                    NavigationBar {
+                        TopLevelDestination.entries.forEach { dest ->
+                            NavigationBarItem(
+                                selected = currentDestination?.hierarchy
+                                    ?.any { it.hasRoute(dest.route::class) } == true,
+                                onClick = {
+                                    navController.navigate(dest.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(dest.icon, contentDescription = null) },
-                            label = { Text(stringResource(dest.label)) },
-                        )
+                                },
+                                icon = { Icon(dest.icon, contentDescription = null) },
+                                label = { Text(stringResource(dest.label)) },
+                            )
+                        }
                     }
                 }
             }
