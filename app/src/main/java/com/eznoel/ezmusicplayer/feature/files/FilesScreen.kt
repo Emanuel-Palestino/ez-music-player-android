@@ -25,10 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eznoel.ezmusicplayer.core.model.RawAudioFile
+import com.eznoel.ezmusicplayer.navigation.EditTagsRoute
 
 @Composable
 fun FilesScreen(
     onNavigateToFolderConfig: () -> Unit,
+    onNavigateToEditTags: (EditTagsRoute) -> Unit,
     viewModel: FilesViewModel = hiltViewModel(),
 ) {
     MediaPermissionGate {
@@ -67,7 +69,18 @@ fun FilesScreen(
                             key = { it.id },
                             contentType = { "file_row" }
                         ) { file ->
-                            RawFileRow(file = file, onEditClick = {  })
+                            RawFileRow(
+                                file = file,
+                                onEditClick = {
+                                    onNavigateToEditTags(
+                                        EditTagsRoute(
+                                            uriString = file.contentUri.toString(),
+                                            fileName = file.displayName,
+                                            relativePath = file.relativePath
+                                        )
+                                    )
+                                }
+                            )
                         }
                     }
                 }

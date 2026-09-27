@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ezMusicPlayer"
 include(":app")
+include(":media-tag-editor")

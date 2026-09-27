@@ -16,6 +16,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object FolderConfigRoute
 @Serializable data object SettingsRoute
 
+@Serializable data class EditTagsRoute(val uriString: String, val fileName: String, val relativePath: String)
+
 enum class TopLevelDestination(
     val route: Any,
     @StringRes val label: Int,

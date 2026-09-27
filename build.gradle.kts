@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    id("org.jetbrains.kotlin.jvm") version "2.4.20" apply false
 }
