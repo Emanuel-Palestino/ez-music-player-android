@@ -2,5 +2,6 @@
     <string name="app_name">ezReproductor de Música</string>
     <string name="nav_library">Biblioteca</string>
     <string name="nav_playlists">Listas</string>
+    <string name="nav_files">Archivos</string>
     <string name="nav_settings">Ajustes</string>
 </resources>

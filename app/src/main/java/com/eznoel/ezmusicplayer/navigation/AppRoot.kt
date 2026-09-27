@@ -42,7 +42,7 @@ fun AppRoot() {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(painterResource(dest.icon), contentDescription = null) },
+                            icon = { Icon(dest.icon, contentDescription = null) },
                             label = { Text(stringResource(dest.label)) },
                         )
                     }
