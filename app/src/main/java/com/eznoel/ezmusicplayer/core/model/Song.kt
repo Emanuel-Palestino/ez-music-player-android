@@ -15,6 +15,7 @@ data class Song(
     val relativePath: String,
     val sizeBytes: Long,
     val dateAddedSec: Long,
+    val dateModifiedSec: Long,
 )
 
 data class LibrarySummary(

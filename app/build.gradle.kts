@@ -73,6 +73,8 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
     implementation(project(":media-tag-editor"))
+
+    implementation(libs.coil.compose)
 }
 
 ksp {

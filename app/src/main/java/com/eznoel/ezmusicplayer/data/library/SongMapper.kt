@@ -40,4 +40,5 @@ internal fun SongEntity.toSong() = Song(
     relativePath = relativePath,
     sizeBytes = sizeBytes,
     dateAddedSec = dateAddedSec,
+    dateModifiedSec = dateModifiedSec,
 )

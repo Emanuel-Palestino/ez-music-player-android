@@ -47,7 +47,7 @@ fun SongRow(
             .padding(vertical = MaterialTheme.spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        SongCover(modifier = Modifier.size(48.dp))
+        SongCover(song = song, modifier = Modifier.size(48.dp))
         Spacer(Modifier.width(MaterialTheme.spacing.md))
 
         Column(modifier = Modifier.weight(1f)) {
@@ -76,21 +76,6 @@ fun SongRow(
     }
 }
 
-@Composable
-private fun SongCover(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.MusicNote,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSecondaryContainer,
-        )
-    }
-}
 
 @Composable
 private fun SongMenu(onEditTagsClick: () -> Unit) {
