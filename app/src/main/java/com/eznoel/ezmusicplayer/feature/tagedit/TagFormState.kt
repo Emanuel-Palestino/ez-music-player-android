@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.files.tagedit
+package com.eznoel.ezmusicplayer.feature.tagedit
 
 import com.tagkit.model.AudioTag
 import com.tagkit.model.Picture

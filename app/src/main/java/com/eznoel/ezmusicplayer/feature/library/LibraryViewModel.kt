@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.files
+package com.eznoel.ezmusicplayer.feature.library
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,18 +12,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FilesViewModel @Inject constructor(
+class LibraryViewModel @Inject constructor(
     private val repository: RawFilesRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<FilesUiState> = repository.observeFiles()
+    val uiState: StateFlow<LibraryUiState> = repository.observeFiles()
         .map { files ->
-            if (files.isEmpty()) FilesUiState.Empty else FilesUiState.Content(files)
+            if (files.isEmpty()) LibraryUiState.Empty else LibraryUiState.Content(files)
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = FilesUiState.Loading
+            initialValue = LibraryUiState.Loading
         )
 
     init {

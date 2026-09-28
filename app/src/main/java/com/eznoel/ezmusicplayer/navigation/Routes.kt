@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object LibraryRoute
 @Serializable data object PlaylistsRoute
-@Serializable data object FilesRoute
 @Serializable data object FolderConfigRoute
 @Serializable data object SettingsRoute
 
@@ -25,6 +24,5 @@ enum class TopLevelDestination(
 ) {
     LIBRARY(LibraryRoute, R.string.nav_library, Icons.Rounded.LibraryMusic),
     PLAYLISTS(PlaylistsRoute, R.string.nav_playlists, Icons.AutoMirrored.Rounded.QueueMusic),
-    FILES(FilesRoute, R.string.nav_files, Icons.Rounded.Folder),
     SETTINGS(SettingsRoute, R.string.nav_settings, Icons.Rounded.Settings),
 }

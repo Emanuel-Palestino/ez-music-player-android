@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.files.tagedit
+package com.eznoel.ezmusicplayer.feature.tagedit
 
 import android.content.IntentSender
 import android.net.Uri

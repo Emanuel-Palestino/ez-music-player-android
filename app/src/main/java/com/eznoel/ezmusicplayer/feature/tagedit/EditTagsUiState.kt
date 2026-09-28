@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.files.tagedit
+package com.eznoel.ezmusicplayer.feature.tagedit
 
 sealed interface EditTagsUiState {
     data object Loading : EditTagsUiState

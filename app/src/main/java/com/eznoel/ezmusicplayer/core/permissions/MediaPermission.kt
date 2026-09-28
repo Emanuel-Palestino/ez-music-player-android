@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.core.common
+package com.eznoel.ezmusicplayer.core.permissions
 
 import android.Manifest
 import android.os.Build

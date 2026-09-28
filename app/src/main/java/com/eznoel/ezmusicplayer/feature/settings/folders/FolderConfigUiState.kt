@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.files
+package com.eznoel.ezmusicplayer.feature.settings.folders
 
 import com.eznoel.ezmusicplayer.core.model.LibraryFolder
 

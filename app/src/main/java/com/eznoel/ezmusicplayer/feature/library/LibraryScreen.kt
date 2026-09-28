@@ -2,22 +2,26 @@ package com.eznoel.ezmusicplayer.feature.library
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,9 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.getValue
@@ -41,19 +46,25 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eznoel.ezmusicplayer.core.common.formatDuration
 import com.eznoel.ezmusicplayer.core.designsystem.spacing
+import com.eznoel.ezmusicplayer.core.model.RawAudioFile
+import com.eznoel.ezmusicplayer.core.permissions.MediaPermissionGate
+import com.eznoel.ezmusicplayer.navigation.EditTagsRoute
 
-@Preview(showBackground = true)
 @Composable
-fun LibraryScreen() {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars),
-        contentPadding = PaddingValues(
-            horizontal = 12.dp,
-            vertical = MaterialTheme.spacing.sm,
-        ),
-    ) {
-        item(key = "header") {
+fun LibraryScreen(
+    onNavigateToEditTags: (EditTagsRoute) -> Unit,
+    viewModel: LibraryViewModel = hiltViewModel(),
+) {
+    MediaPermissionGate {
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        Column(
+            modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = 12.dp, vertical = MaterialTheme.spacing.sm),
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Bottom,
@@ -71,14 +82,10 @@ fun LibraryScreen() {
                 )
             }
             Spacer(Modifier.height(MaterialTheme.spacing.lg))
-        }
 
-        item(key = "filter") {
             ConnectedButtons()
             Spacer(Modifier.height(MaterialTheme.spacing.md))
-        }
 
-        item(key = "sort_shuffle") {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -111,6 +118,44 @@ fun LibraryScreen() {
             }
 
             Spacer(Modifier.height(MaterialTheme.spacing.md))
+
+            when (uiState) {
+                is LibraryUiState.Loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is LibraryUiState.Empty -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No hay archivos en las carpetas incluidas.")
+                    }
+                }
+
+                is LibraryUiState.Content -> {
+                    val files = (uiState as LibraryUiState.Content).files
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+                        items(
+                            items = files,
+                            key = { it.id },
+                            contentType = { "file_row" }
+                        ) { file ->
+                            RawFileRow(
+                                file = file,
+                                onEditClick = {
+                                    onNavigateToEditTags(
+                                        EditTagsRoute(
+                                            uriString = file.contentUri.toString(),
+                                            fileName = file.displayName,
+                                            relativePath = file.relativePath
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -141,6 +186,30 @@ fun ConnectedButtons() {
             ) {
                 Text(filter, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
             }
+        }
+    }
+}
+
+@Composable
+private fun RawFileRow(
+    file: RawAudioFile,
+    onEditClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(file.displayName, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
+            Text(
+                "${file.relativePath} · ${formatDuration(file.durationMs)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
+            )
+        }
+        IconButton(onClick = onEditClick) {
+            Icon(Icons.Rounded.Edit, contentDescription = "Editar tags")
         }
     }
 }

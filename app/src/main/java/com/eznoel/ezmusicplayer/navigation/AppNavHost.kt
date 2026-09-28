@@ -9,9 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.eznoel.ezmusicplayer.feature.files.FolderConfigScreen
-import com.eznoel.ezmusicplayer.feature.files.FilesScreen
-import com.eznoel.ezmusicplayer.feature.files.tagedit.EditTagsScreen
+import com.eznoel.ezmusicplayer.feature.settings.folders.FolderConfigScreen
+import com.eznoel.ezmusicplayer.feature.tagedit.EditTagsScreen
 import com.eznoel.ezmusicplayer.feature.library.LibraryScreen
 import com.eznoel.ezmusicplayer.feature.library.PlaylistsScreen
 import com.eznoel.ezmusicplayer.feature.library.SettingsScreen
@@ -27,12 +26,16 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         popEnterTransition = { fadeIn(tween(150)) },
         popExitTransition = { fadeOut(tween(90)) },
     ) {
-        composable<LibraryRoute> { LibraryScreen() }
-        composable<PlaylistsRoute> { PlaylistsScreen() }
-        composable<FilesRoute> {
-            FilesScreen(
-                onNavigateToFolderConfig = { navController.navigate(FolderConfigRoute) },
+        composable<LibraryRoute> {
+            LibraryScreen(
                 onNavigateToEditTags = { route -> navController.navigate(route) }
+            )
+        }
+        composable<PlaylistsRoute> { PlaylistsScreen() }
+
+        composable<SettingsRoute> {
+            SettingsScreen(
+                onNavigateToFolderConfig = { navController.navigate(FolderConfigRoute) },
             )
         }
         composable<FolderConfigRoute> {
@@ -40,7 +43,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 onBackClick = { navController.navigateUp() }
             )
         }
-        composable<SettingsRoute> { SettingsScreen() }
+
         composable<EditTagsRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<EditTagsRoute>()
             EditTagsScreen(

@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.files
+package com.eznoel.ezmusicplayer.feature.settings.folders
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,8 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eznoel.ezmusicplayer.core.common.formatSize
 import com.eznoel.ezmusicplayer.core.designsystem.spacing
 import com.eznoel.ezmusicplayer.core.model.LibraryFolder
+import com.eznoel.ezmusicplayer.core.permissions.MediaPermissionGate
 
 @Composable
 fun FolderConfigScreen(
@@ -53,62 +55,65 @@ fun FolderConfigContent(
     onFolderToggled: (relativePath: String, included: Boolean) -> Unit,
     onRescanRequested: () -> Unit,
 ) {
-    Column(Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = { Text("Carpetas de biblioteca") },
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver")
-                }
-            },
-            actions = {
-                val isRescanning = (uiState as? FolderConfigUiState.Content)?.isRescanning ?: false
-                IconButton(onClick = onRescanRequested, enabled = !isRescanning) {
-                    if (isRescanning) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                    } else {
-                        Icon(Icons.Rounded.Refresh, contentDescription = "Reescanear")
+    MediaPermissionGate {
+        Column(Modifier.fillMaxSize()) {
+            TopAppBar(
+                title = { Text("Carpetas de biblioteca") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver")
                     }
-                }
-            },
-        )
-
-        Box(Modifier.weight(1f)) {
-            when (uiState) {
-                is FolderConfigUiState.Loading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                },
+                actions = {
+                    val isRescanning =
+                        (uiState as? FolderConfigUiState.Content)?.isRescanning ?: false
+                    IconButton(onClick = onRescanRequested, enabled = !isRescanning) {
+                        if (isRescanning) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                        } else {
+                            Icon(Icons.Rounded.Refresh, contentDescription = "Reescanear")
+                        }
                     }
-                }
+                },
+            )
 
-                is FolderConfigUiState.Empty -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No se encontró música en el dispositivo.\nToca reescanear si acabas de agregar archivos.")
+            Box(Modifier.weight(1f)) {
+                when (uiState) {
+                    is FolderConfigUiState.Loading -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
 
-                is FolderConfigUiState.Content -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            horizontal = 12.dp,
-                            vertical = MaterialTheme.spacing.sm,
-                        ),
-                    ) {
-                        items(
-                            items = uiState.folders,
-                            key = { it.relativePath },
-                            contentType = { "folder_row" }
-                        ) { folder ->
-                            FolderRow(
-                                folder = folder,
-                                onToggle = { included ->
-                                    onFolderToggled(
-                                        folder.relativePath,
-                                        included
-                                    )
-                                }
-                            )
+                    is FolderConfigUiState.Empty -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No se encontró música en el dispositivo.\nToca reescanear si acabas de agregar archivos.")
+                        }
+                    }
+
+                    is FolderConfigUiState.Content -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                horizontal = 12.dp,
+                                vertical = MaterialTheme.spacing.sm,
+                            ),
+                        ) {
+                            items(
+                                items = uiState.folders,
+                                key = { it.relativePath },
+                                contentType = { "folder_row" }
+                            ) { folder ->
+                                FolderRow(
+                                    folder = folder,
+                                    onToggle = { included ->
+                                        onFolderToggled(
+                                            folder.relativePath,
+                                            included
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -139,9 +144,4 @@ private fun FolderRow(
         }
         Switch(checked = folder.isIncluded, onCheckedChange = onToggle)
     }
-}
-
-private fun formatSize(bytes: Long): String {
-    val mb = bytes / (1024.0 * 1024.0)
-    return if (mb >= 1024) "%.1f GB".format(mb / 1024.0) else "%.0f MB".format(mb)
 }
