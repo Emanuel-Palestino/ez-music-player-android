@@ -22,6 +22,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,7 @@ fun FolderConfigScreen(
         onBackClick = onBackClick,
         onFolderToggled = viewModel::onFolderToggled,
         onRescanRequested = viewModel::onRescanRequested,
+        viewModel::onScreenReady,
     )
 }
 
@@ -54,8 +56,10 @@ fun FolderConfigContent(
     onBackClick: () -> Unit,
     onFolderToggled: (relativePath: String, included: Boolean) -> Unit,
     onRescanRequested: () -> Unit,
+    onScreenReady: () -> Unit,
 ) {
     MediaPermissionGate {
+        LaunchedEffect(Unit) { onScreenReady() }
         Column(Modifier.fillMaxSize()) {
             TopAppBar(
                 title = { Text("Carpetas de biblioteca") },

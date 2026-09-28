@@ -2,7 +2,7 @@ package com.eznoel.ezmusicplayer.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eznoel.ezmusicplayer.data.rawfiles.RawFilesRepository
+import com.eznoel.ezmusicplayer.data.library.LibraryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val repository: RawFilesRepository
+    private val repository: LibraryRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<SettingsUiState> = repository.observeFolders()
@@ -29,8 +29,4 @@ class SettingsViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = SettingsUiState.Loading
         )
-
-    init {
-        viewModelScope.launch { repository.refreshFolders() }
-    }
 }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,9 +34,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,9 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.eznoel.ezmusicplayer.core.common.formatDuration
+import com.eznoel.ezmusicplayer.core.common.formatSize
+import com.eznoel.ezmusicplayer.core.designsystem.SongRow
 import com.eznoel.ezmusicplayer.core.designsystem.spacing
-import com.eznoel.ezmusicplayer.core.model.RawAudioFile
 import com.eznoel.ezmusicplayer.core.permissions.MediaPermissionGate
 import com.eznoel.ezmusicplayer.navigation.EditTagsRoute
 
@@ -60,6 +59,7 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = hiltViewModel(),
 ) {
     MediaPermissionGate {
+        LaunchedEffect(Unit) { viewModel.onScreenReady() }
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         Column(
             modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)
@@ -70,13 +70,14 @@ fun LibraryScreen(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
+                val summary = (uiState as? LibraryUiState.Content)?.summary
                 Text(
                     text = "Biblioteca",
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.semantics { heading() },
                 )
                 Text(
-                    text = "8 GB",
+                    text = summary?.let { formatSize(it.totalSizeBytes) }.orEmpty(),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -133,24 +134,24 @@ fun LibraryScreen(
                 }
 
                 is LibraryUiState.Content -> {
-                    val files = (uiState as LibraryUiState.Content).files
+                    val songs = (uiState as LibraryUiState.Content).songs
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(
-                            items = files,
+                            items = songs,
                             key = { it.id },
-                            contentType = { "file_row" }
-                        ) { file ->
-                            RawFileRow(
-                                file = file,
-                                onEditClick = {
+                            contentType = { "song_row" },
+                        ) { song ->
+                            SongRow(
+                                song = song,
+                                onEditTagsClick = {
                                     onNavigateToEditTags(
                                         EditTagsRoute(
-                                            uriString = file.contentUri.toString(),
-                                            fileName = file.displayName,
-                                            relativePath = file.relativePath
+                                            uriString = song.contentUri,
+                                            fileName = song.displayName,
+                                            relativePath = song.relativePath,
                                         )
                                     )
-                                }
+                                },
                             )
                         }
                     }
@@ -186,30 +187,6 @@ fun ConnectedButtons() {
             ) {
                 Text(filter, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
             }
-        }
-    }
-}
-
-@Composable
-private fun RawFileRow(
-    file: RawAudioFile,
-    onEditClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(file.displayName, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
-            Text(
-                "${file.relativePath} · ${formatDuration(file.durationMs)}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1
-            )
-        }
-        IconButton(onClick = onEditClick) {
-            Icon(Icons.Rounded.Edit, contentDescription = "Editar tags")
         }
     }
 }

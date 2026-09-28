@@ -65,9 +65,16 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
     implementation(libs.androidx.datastore.preferences)
     implementation(project(":media-tag-editor"))
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }

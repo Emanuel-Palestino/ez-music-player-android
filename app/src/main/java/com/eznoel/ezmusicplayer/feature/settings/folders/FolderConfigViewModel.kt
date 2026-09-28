@@ -2,6 +2,7 @@ package com.eznoel.ezmusicplayer.feature.settings.folders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eznoel.ezmusicplayer.data.library.LibraryRepository
 import com.eznoel.ezmusicplayer.data.rawfiles.RawFilesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,14 +15,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FolderConfigViewModel @Inject constructor(
-    private val repository: RawFilesRepository
+    private val repository: LibraryRepository,   // antes RawFilesRepository
 ) : ViewModel() {
 
     private val isRescanning = MutableStateFlow(false)
 
     val uiState: StateFlow<FolderConfigUiState> = combine(
         repository.observeFolders(),
-        isRescanning
+        isRescanning,
     ) { folders, rescanning ->
         when {
             folders.isEmpty() && !rescanning -> FolderConfigUiState.Empty
@@ -30,11 +31,11 @@ class FolderConfigViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = FolderConfigUiState.Loading
+        initialValue = FolderConfigUiState.Loading,
     )
 
-    init {
-        viewModelScope.launch { repository.refreshFolders() }
+    fun onScreenReady() {
+        viewModelScope.launch { repository.sync() }
     }
 
     fun onFolderToggled(relativePath: String, included: Boolean) {
@@ -44,8 +45,7 @@ class FolderConfigViewModel @Inject constructor(
     fun onRescanRequested() {
         viewModelScope.launch {
             isRescanning.value = true
-            repository.forceRescan()
-            isRescanning.value = false
+            try { repository.forceRescan() } finally { isRescanning.value = false }
         }
     }
 }
