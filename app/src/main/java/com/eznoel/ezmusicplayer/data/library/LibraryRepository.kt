@@ -14,4 +14,5 @@ interface LibraryRepository {
     suspend fun setFolderIncluded(relativePath: String, included: Boolean)
     suspend fun sync()
     suspend fun forceRescan()
+    suspend fun getSongById(id: Long): Song?
 }

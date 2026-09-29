@@ -103,7 +103,7 @@ fun LibraryScreen(
                 }
 
                 Button(
-                    onClick = {},
+                    onClick = viewModel::onShuffleClick,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                     ),
@@ -143,6 +143,7 @@ fun LibraryScreen(
                         ) { song ->
                             SongRow(
                                 song = song,
+                                onClick = { viewModel.onSongClick(song) },
                                 onEditTagsClick = {
                                     onNavigateToEditTags(
                                         EditTagsRoute(

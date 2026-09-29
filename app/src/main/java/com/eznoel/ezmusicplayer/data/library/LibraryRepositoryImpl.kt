@@ -63,4 +63,6 @@ class LibraryRepositoryImpl @Inject constructor(
         scanner.forceRescan()
         syncer.sync()
     }
+
+    override suspend fun getSongById(id: Long): Song? = songDao.getById(id)?.toSong()
 }

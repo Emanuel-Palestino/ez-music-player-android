@@ -53,4 +53,7 @@ interface SongDao {
     """
     )
     fun observeFolders(): Flow<List<FolderRow>>
+
+    @Query("SELECT * FROM songs WHERE id = :id")
+    suspend fun getById(id: Long): SongEntity?
 }
