@@ -1,5 +1,6 @@
 package com.eznoel.ezmusicplayer.feature.miniplayer
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +30,16 @@ import com.eznoel.ezmusicplayer.R
 import com.eznoel.ezmusicplayer.core.designsystem.SongCover
 
 @Composable
-fun MiniPlayer(viewModel: MiniPlayerViewModel = hiltViewModel()) {
+fun MiniPlayer(
+    onClick: () -> Unit,
+    viewModel: MiniPlayerViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val state = uiState ?: return // nada sonando: no ocupa espacio
 
-    Column {
+    Column(
+        modifier = Modifier.clickable(onClick = onClick),
+    ) {
         LinearProgressIndicator(
             progress = { state.progress },
             modifier = Modifier.fillMaxWidth(),

@@ -50,7 +50,7 @@ fun AppRoot() {
         bottomBar = {
             if (isTopLevelDestination) {
                 Column {
-                    MiniPlayer()
+                    MiniPlayer(onClick = { navController.navigate(NowPlayingRoute) })
                     NavigationBar {
                         TopLevelDestination.entries.forEach { dest ->
                             NavigationBarItem(

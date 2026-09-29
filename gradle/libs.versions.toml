@@ -19,6 +19,7 @@ datastorePreferences = "1.2.1"
 runtime = "1.12.1"
 coil = "3.6.3"
 media3 = "1.11.1"
+androidxPalette = "1.0.0"
 
 
 [libraries]
@@ -50,6 +51,7 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
+androidx-palette = { module = "androidx.palette:palette", version.ref = "androidxPalette" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

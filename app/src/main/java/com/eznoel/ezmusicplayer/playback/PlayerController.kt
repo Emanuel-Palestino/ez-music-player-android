@@ -13,4 +13,6 @@ interface PlayerController {
     fun seekTo(positionMs: Long)
     fun skipNext()
     fun skipPrevious()
+    fun toggleShuffle()
+    fun cycleRepeatMode()
 }

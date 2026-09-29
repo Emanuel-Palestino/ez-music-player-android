@@ -1,7 +1,6 @@
 package com.eznoel.ezmusicplayer.playback
 
 import android.content.ComponentName
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import androidx.media3.common.MediaItem
@@ -9,12 +8,12 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.eznoel.ezmusicplayer.core.model.PlaybackState
+import com.eznoel.ezmusicplayer.core.model.RepeatMode
 import com.eznoel.ezmusicplayer.core.model.Song
 import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,10 +85,26 @@ class PlayerControllerImpl @Inject constructor(
         )
     }
 
+    override fun toggleShuffle() {
+        controller?.let { it.shuffleModeEnabled = !it.shuffleModeEnabled }
+    }
+
+    override fun cycleRepeatMode() {
+        controller?.let {
+            it.repeatMode = when (it.repeatMode) {
+                Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                else -> Player.REPEAT_MODE_OFF
+            }
+        }
+    }
+
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) = updateState()
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = updateState()
         override fun onPlaybackStateChanged(playbackState: Int) = updateState()
+        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) = updateState()
+        override fun onRepeatModeChanged(repeatMode: Int) = updateState()
     }
 
     private fun updateState() {
@@ -104,6 +119,13 @@ class PlayerControllerImpl @Inject constructor(
             durationMs = c.duration.coerceAtLeast(0L),
             hasNext = c.hasNextMediaItem(),
             hasPrevious = c.hasPreviousMediaItem(),
+            isShuffleEnabled = c.shuffleModeEnabled,
+            repeatMode = when (c.repeatMode) {
+                Player.REPEAT_MODE_ALL -> RepeatMode.ALL
+                Player.REPEAT_MODE_ONE -> RepeatMode.ONE
+                else -> RepeatMode.OFF
+            },
+            queueSize = (c.mediaItemCount - c.currentMediaItemIndex - 1).coerceAtLeast(0),
         )
     }
 

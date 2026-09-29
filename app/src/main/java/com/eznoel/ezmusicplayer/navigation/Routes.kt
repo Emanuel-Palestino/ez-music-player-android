@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 
 @Serializable data class EditTagsRoute(val uriString: String, val fileName: String, val relativePath: String)
+@Serializable data object NowPlayingRoute
 
 enum class TopLevelDestination(
     val route: Any,
