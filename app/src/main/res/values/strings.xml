@@ -7,4 +7,9 @@
     <string name="unknown_artist">Artista desconocido</string>
     <string name="song_more_options">Más opciones</string>
     <string name="song_edit_tags">Editar información</string>
+    <string name="song_add_to_playlist">Agregar a</string>
+    <string name="player_pause">Pausar canción</string>
+    <string name="player_play">Continuar reproducción\n</string>
+    <string name="player_next">Siguiente canción</string>
+    <string name="player_previous">Canción anterior</string>
 </resources>

@@ -1,15 +1,16 @@
 package com.eznoel.ezmusicplayer.feature.library
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -17,11 +18,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
-import androidx.compose.material.icons.rounded.Shuffle
+import androidx.compose.material.icons.rounded.Casino
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +49,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eznoel.ezmusicplayer.core.common.formatSize
 import com.eznoel.ezmusicplayer.core.designsystem.SongRow
-import com.eznoel.ezmusicplayer.core.designsystem.spacing
+import com.eznoel.ezmusicplayer.core.model.LibrarySummary
 import com.eznoel.ezmusicplayer.core.permissions.MediaPermissionGate
 import com.eznoel.ezmusicplayer.navigation.EditTagsRoute
 
@@ -62,63 +62,19 @@ fun LibraryScreen(
         LaunchedEffect(Unit) { viewModel.onScreenReady() }
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         Column(
-            modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)
-                .padding(horizontal = 12.dp, vertical = MaterialTheme.spacing.sm),
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                val summary = (uiState as? LibraryUiState.Content)?.summary
-                Text(
-                    text = "Biblioteca",
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.semantics { heading() },
-                )
-                Text(
-                    text = summary?.let { formatSize(it.totalSizeBytes) }.orEmpty(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Spacer(Modifier.height(MaterialTheme.spacing.lg))
+            LibraryHeader((uiState as? LibraryUiState.Content)?.summary)
+            Spacer(Modifier.height(20.dp))
 
-            ConnectedButtons()
-            Spacer(Modifier.height(MaterialTheme.spacing.md))
+            ListViewTabs()
+            Spacer(Modifier.height(6.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowDownward,
-                        contentDescription = null,
-                        modifier = Modifier.size(ButtonDefaults.IconSize),
-                    )
-                    Spacer(Modifier.width(MaterialTheme.spacing.sm))
-                    Text("Recientes", style = MaterialTheme.typography.titleMedium)
-                }
+            SortAndShuffle(viewModel::onShuffleClick)
 
-                Button(
-                    onClick = viewModel::onShuffleClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Shuffle,
-                        contentDescription = null,
-                        modifier = Modifier.size(ButtonDefaults.IconSize),
-                    )
-                    Spacer(Modifier.width(MaterialTheme.spacing.sm))
-                    Text("Aleatorio")
-                }
-            }
-
-            Spacer(Modifier.height(MaterialTheme.spacing.md))
+            Spacer(Modifier.height(10.dp))
 
             when (uiState) {
                 is LibraryUiState.Loading -> {
@@ -135,7 +91,12 @@ fun LibraryScreen(
 
                 is LibraryUiState.Content -> {
                     val songs = (uiState as LibraryUiState.Content).songs
-                    LazyColumn(modifier = Modifier.weight(1f)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 120.dp)
+                    ) {
                         items(
                             items = songs,
                             key = { it.id },
@@ -161,16 +122,43 @@ fun LibraryScreen(
         }
     }
 }
+
 @Composable
-fun ConnectedButtons() {
-    val filters: List<String> = listOf("Canciones", "Álbumes", "Artistas", "Géneros")
+fun LibraryHeader(
+    summary: LibrarySummary? = null,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = "Biblioteca",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = summary?.let { formatSize(it.totalSizeBytes) }.orEmpty(),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+fun ListViewTabs() {
+    val filters: List<String> = listOf("Canciones", "Álbumes", "Artistas")
     var selected by remember {mutableStateOf("Canciones")}
 
     Row(
         modifier = Modifier
-            .horizontalScroll(rememberScrollState())
-            .selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+            //.horizontalScroll(rememberScrollState())
+            .fillMaxWidth()
+            .selectableGroup()
+            .padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         filters.forEachIndexed {index, filter ->
             val isSelected = filter == selected
@@ -184,10 +172,60 @@ fun ConnectedButtons() {
                     filters.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                     else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                 },
-                modifier = Modifier.semantics { role = Role.RadioButton },
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { role = Role.RadioButton },
             ) {
-                Text(filter, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
+                Text(
+                    filter,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun SortAndShuffle(
+    onShuffleClick: () -> Unit,
+) {
+    val buttonsSize = ButtonDefaults.MinHeight
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TextButton(
+            onClick = {},
+            modifier = Modifier.heightIn(min = buttonsSize),
+            contentPadding = ButtonDefaults.contentPaddingFor(buttonsSize, hasStartIcon = true),
+            shapes = ButtonDefaults.shapes(),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.ArrowDownward,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.iconSizeFor(buttonsSize)),
+            )
+            Spacer(Modifier.width(ButtonDefaults.iconSpacingFor(buttonsSize)))
+            Text("Recientes", style = ButtonDefaults.textStyleFor(buttonsSize))
+        }
+
+        Button(
+            onClick = onShuffleClick,
+            modifier = Modifier.heightIn(min = buttonsSize),
+            contentPadding = ButtonDefaults.contentPaddingFor(buttonsSize, hasStartIcon = true),
+            shapes = ButtonDefaults.shapes(),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Casino,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.iconSizeFor(buttonsSize)),
+            )
+            Spacer(Modifier.width(ButtonDefaults.iconSpacingFor(buttonsSize)))
+            Text("Aleatorio", style = ButtonDefaults.textStyleFor(buttonsSize))
         }
     }
 }

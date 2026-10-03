@@ -7,4 +7,5 @@ data class MiniPlayerUiState(
     val isPlaying: Boolean,
     val progress: Float,
     val hasNext: Boolean,
+    val hasPrevious: Boolean,
 )

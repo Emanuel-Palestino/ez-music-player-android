@@ -30,7 +30,8 @@ class MiniPlayerViewModel @Inject constructor(
             progress = if (state.durationMs > 0) {
                 (position.toFloat() / state.durationMs).coerceIn(0f, 1f)
             } else 0f,
-            hasNext = state.hasNext
+            hasNext = state.hasNext,
+            hasPrevious = state.hasPrevious,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -41,4 +42,6 @@ class MiniPlayerViewModel @Inject constructor(
     fun onPlayPauseClick() = playerController.togglePlayPause()
 
     fun onNextClick() = playerController.skipNext()
+
+    fun onPreviousClick() = playerController.skipPrevious()
 }
