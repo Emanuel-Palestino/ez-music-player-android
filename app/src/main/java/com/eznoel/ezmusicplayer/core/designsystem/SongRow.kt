@@ -1,24 +1,17 @@
 package com.eznoel.ezmusicplayer.core.designsystem
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AddCircle
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -87,33 +80,13 @@ private fun SongMenu(onEditTagsClick: () -> Unit) {
                 modifier = Modifier.size(IconButtonDefaults.smallIconSize),
             )
         }
-        DropdownMenuPopup(
+        SongOptionsMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuGroup(
-                shapes = MenuDefaults.groupShape(index = 0, count = 1),
-                containerColor = MenuDefaults.groupStandardContainerColor,
-                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp), // Defaults 0.dp, 2.dp doesn't look good
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.song_edit_tags)) },
-                    leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
-                    shape = MenuDefaults.itemShape(index = 0, count = 2).shape,
-                    onClick = {
-                        expanded = false
-                        onEditTagsClick()
-                    },
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.song_add_to_playlist)) },
-                    leadingIcon = { Icon(Icons.Rounded.AddCircle, contentDescription = null) },
-                    shape = MenuDefaults.itemShape(index = 1, count = 2).shape,
-                    onClick = {
-                        expanded = false
-                    },
-                )
-            }
-        }
+            onEditTagsClick = {
+                expanded = false
+                onEditTagsClick()
+            },
+        )
     }
 }

@@ -16,10 +16,10 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -101,15 +101,18 @@ fun MiniPlayer(
                     )
                 }
 
-                FilledIconButton(
-                    onClick = viewModel::onPlayPauseClick,
+                FilledIconToggleButton(
+                    checked = state.isPlaying,
+                    onCheckedChange = { viewModel.onPlayPauseClick() },
                     modifier = Modifier.size(
                         IconButtonDefaults.mediumContainerSize(),
                     ),
-                    shapes = IconButtonShapes(
-                        shape = IconButtonDefaults.mediumRoundShape,
-                        pressedShape = IconButtonDefaults.mediumPressedShape,
-                    )
+                    shapes = IconButtonDefaults.toggleableShapes(),
+                    colors = IconButtonDefaults.filledIconToggleButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
                 ) {
                     Icon(
                         imageVector = if (state.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,

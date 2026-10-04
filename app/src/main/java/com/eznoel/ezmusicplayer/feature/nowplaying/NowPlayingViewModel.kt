@@ -1,9 +1,9 @@
 package com.eznoel.ezmusicplayer.feature.nowplaying
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eznoel.ezmusicplayer.core.image.CoverPaletteExtractor
+import com.eznoel.ezmusicplayer.core.image.CoverSeeds
 import com.eznoel.ezmusicplayer.core.model.PlaybackState
 import com.eznoel.ezmusicplayer.playback.PlayerController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,15 +23,15 @@ class NowPlayingViewModel @Inject constructor(
     private val paletteExtractor: CoverPaletteExtractor,
 ) : ViewModel() {
 
-    private val backgroundColor = MutableStateFlow<Color?>(null)
+    private val coverSeeds = MutableStateFlow<CoverSeeds?>(null)
     private var lastSongId: Long? = null
 
     val uiState: StateFlow<NowPlayingUiState?> = combine(
         playerController.state,
         playerController.positionMs,
-        backgroundColor,
-    ) { state, position, color ->
-        state.toUiState(position, color)
+        coverSeeds,
+    ) { state, position, seeds ->
+        state.toUiState(position, seeds)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -46,14 +46,16 @@ class NowPlayingViewModel @Inject constructor(
                 .distinctUntilChanged { old, new -> old?.id == new?.id }
                 .collect { song ->
                     lastSongId = song?.id
-                    backgroundColor.value = null // limpia mientras se calcula la nueva
-                    if (song != null) {
-                        val fallback = Color(0xFFE8DEF8) // valor neutro si falla la extracción
-                        val color = paletteExtractor.extractColor(song, fallback)
-                        // Evita pintar un color viejo si el usuario ya saltó a otra canción
-                        // mientras se calculaba este (extractColor es async).
-                        if (lastSongId == song.id) backgroundColor.value = color
+                    if (song == null) {
+                        coverSeeds.value = null
+                        return@collect
                     }
+                    // No se limpia antes de calcular: así los colores pasan de una canción a la
+                    // siguiente con una sola animación, sin volver al tema base en medio.
+                    val seeds = paletteExtractor.extractSeeds(song) // null si no hay carátula o falla
+                    // Evita pintar colores viejos si el usuario ya saltó a otra canción
+                    // mientras se calculaba este (extractSeeds es async).
+                    if (lastSongId == song.id) coverSeeds.value = seeds
                 }
         }
     }
@@ -67,7 +69,7 @@ class NowPlayingViewModel @Inject constructor(
 }
 
 
-private fun PlaybackState.toUiState(positionMs: Long, backgroundColor: Color?): NowPlayingUiState? {
+private fun PlaybackState.toUiState(positionMs: Long, coverSeeds: CoverSeeds?): NowPlayingUiState? {
     val song = currentSong ?: return null
     return NowPlayingUiState(
         song = song,
@@ -79,6 +81,6 @@ private fun PlaybackState.toUiState(positionMs: Long, backgroundColor: Color?): 
         isShuffleEnabled = isShuffleEnabled,
         repeatMode = repeatMode,
         queueSize = queueSize,
-        backgroundColor = backgroundColor,
+        coverSeeds = coverSeeds,
     )
 }

@@ -1,6 +1,6 @@
 package com.eznoel.ezmusicplayer.feature.nowplaying
 
-import androidx.compose.ui.graphics.Color
+import com.eznoel.ezmusicplayer.core.image.CoverSeeds
 import com.eznoel.ezmusicplayer.core.model.RepeatMode
 import com.eznoel.ezmusicplayer.core.model.Song
 
@@ -14,5 +14,5 @@ data class NowPlayingUiState(
     val isShuffleEnabled: Boolean,
     val repeatMode: RepeatMode,
     val queueSize: Int,
-    val backgroundColor: Color?,
+    val coverSeeds: CoverSeeds?,
 )
