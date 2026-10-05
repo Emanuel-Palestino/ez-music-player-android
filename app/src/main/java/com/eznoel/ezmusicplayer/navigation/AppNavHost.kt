@@ -47,10 +47,8 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
             )
         }
 
-        composable<EditTagsRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<EditTagsRoute>()
+        composable<EditTagsRoute> {
             EditTagsScreen(
-                route = route,
                 onClose = { navController.navigateUp() }
             )
         }

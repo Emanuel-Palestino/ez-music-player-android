@@ -12,28 +12,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.AsyncImage
+import coil3.compose.useExistingImageAsPlaceholder
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.eznoel.ezmusicplayer.core.image.CoverArtRequest
 import com.eznoel.ezmusicplayer.core.model.Song
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
-fun SongCover(song: Song, modifier: Modifier = Modifier) {
+fun SongCover(
+    song: Song,
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(8.dp),
+    crossFade: Boolean = true,
+    coverOverride: ByteArray? = null,
+) {
     val context = LocalContext.current
-    val request = remember(song.contentUri, song.dateModifiedSec) {
+    val request = remember(song.contentUri, song.dateModifiedSec, coverOverride, crossFade) {
         ImageRequest.Builder(context)
-            .data(CoverArtRequest(song.contentUri, song.dateModifiedSec))
-            .crossfade(true)
+            .data(coverOverride ?: CoverArtRequest(song.contentUri, song.dateModifiedSec))
+            .crossfade(crossFade)
+            .useExistingImageAsPlaceholder(true)
             .build()
     }
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(shape)
             .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center,
     ) {

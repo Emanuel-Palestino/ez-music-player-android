@@ -108,9 +108,8 @@ fun LibraryScreen(
                                 onEditTagsClick = {
                                     onNavigateToEditTags(
                                         EditTagsRoute(
+                                            songId = song.id,
                                             uriString = song.contentUri,
-                                            fileName = song.displayName,
-                                            relativePath = song.relativePath,
                                         )
                                     )
                                 },

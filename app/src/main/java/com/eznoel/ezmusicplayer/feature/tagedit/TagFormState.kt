@@ -12,7 +12,8 @@ data class TagFormState(
     val year: String = "",
     val genre: String = "",
     val coverBytes: ByteArray? = null,
-    val coverMimeType: String? = null
+    val coverMimeType: String? = null,
+    val coverChanged: Boolean = false,
 )
 
 internal fun AudioTag.toFormState() = TagFormState(
