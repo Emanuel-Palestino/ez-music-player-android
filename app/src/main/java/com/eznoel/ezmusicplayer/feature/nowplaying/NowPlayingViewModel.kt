@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eznoel.ezmusicplayer.core.image.CoverPaletteExtractor
 import com.eznoel.ezmusicplayer.core.image.CoverSeeds
+import com.eznoel.ezmusicplayer.core.image.CurrentCoverSeeds
 import com.eznoel.ezmusicplayer.core.model.PlaybackState
 import com.eznoel.ezmusicplayer.playback.PlayerController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,45 +21,24 @@ import javax.inject.Inject
 @HiltViewModel
 class NowPlayingViewModel @Inject constructor(
     private val playerController: PlayerController,
-    private val paletteExtractor: CoverPaletteExtractor,
+    private val currentCoverSeeds: CurrentCoverSeeds,
 ) : ViewModel() {
-
-    private val coverSeeds = MutableStateFlow<CoverSeeds?>(null)
-    private var lastSongId: Long? = null
 
     val uiState: StateFlow<NowPlayingUiState?> = combine(
         playerController.state,
         playerController.positionMs,
-        coverSeeds,
+        currentCoverSeeds.seeds,
     ) { state, position, seeds ->
         state.toUiState(position, seeds)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = playerController.state.value.toUiState(playerController.positionMs.value, null),
+        // Ya con las semillas: el primer frame sale con los colores correctos.
+        initialValue = playerController.state.value.toUiState(
+            playerController.positionMs.value,
+            currentCoverSeeds.seeds.value,
+        ),
     )
-
-    init {
-        // Solo se dispara cuando cambia la canción, no en cada tick de posición.
-        viewModelScope.launch {
-            playerController.state
-                .map { it.currentSong }
-                .distinctUntilChanged { old, new -> old?.id == new?.id }
-                .collect { song ->
-                    lastSongId = song?.id
-                    if (song == null) {
-                        coverSeeds.value = null
-                        return@collect
-                    }
-                    // No se limpia antes de calcular: así los colores pasan de una canción a la
-                    // siguiente con una sola animación, sin volver al tema base en medio.
-                    val seeds = paletteExtractor.extractSeeds(song) // null si no hay carátula o falla
-                    // Evita pintar colores viejos si el usuario ya saltó a otra canción
-                    // mientras se calculaba este (extractSeeds es async).
-                    if (lastSongId == song.id) coverSeeds.value = seeds
-                }
-        }
-    }
 
     fun onPlayPauseClick() = playerController.togglePlayPause()
     fun onNextClick() = playerController.skipNext()

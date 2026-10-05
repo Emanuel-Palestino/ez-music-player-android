@@ -8,9 +8,11 @@ import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.eznoel.ezmusicplayer.R
@@ -20,6 +22,7 @@ fun SongOptionsMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onEditTagsClick: () -> Unit,
+    containerColor: Color = MenuDefaults.groupStandardContainerColor,
 ) {
     DropdownMenuPopup(
         expanded = expanded,
@@ -27,7 +30,7 @@ fun SongOptionsMenu(
     ) {
         DropdownMenuGroup(
             shapes = MenuDefaults.groupShape(index = 0, count = 1),
-            containerColor = MenuDefaults.groupStandardContainerColor,
+            containerColor = containerColor,
             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp), // Defaults 0.dp, 2.dp doesn't look good
         ) {
             DropdownMenuItem(

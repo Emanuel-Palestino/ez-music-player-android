@@ -2,6 +2,7 @@ package com.eznoel.ezmusicplayer.feature.miniplayer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eznoel.ezmusicplayer.core.image.CurrentCoverSeeds
 import com.eznoel.ezmusicplayer.playback.PlayerControllerImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,16 +14,16 @@ import javax.inject.Inject
 @HiltViewModel
 class MiniPlayerViewModel @Inject constructor(
     private val playerController: PlayerControllerImpl,
+    currentCoverSeeds: CurrentCoverSeeds,
 ) : ViewModel() {
 
-    init {
-        playerController.ensureConnected()
-    }
+    init { playerController.ensureConnected() }
 
     val uiState: StateFlow<MiniPlayerUiState?> = combine(
         playerController.state,
         playerController.positionMs,
-    ) { state, position ->
+        currentCoverSeeds.seeds,
+    ) { state, position, seeds ->
         val song = state.currentSong ?: return@combine null
         MiniPlayerUiState(
             song = song,
@@ -32,6 +33,7 @@ class MiniPlayerViewModel @Inject constructor(
             } else 0f,
             hasNext = state.hasNext,
             hasPrevious = state.hasPrevious,
+            coverSeeds = seeds,
         )
     }.stateIn(
         scope = viewModelScope,

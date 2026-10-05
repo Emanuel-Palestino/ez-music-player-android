@@ -91,6 +91,7 @@ import com.eznoel.ezmusicplayer.R
 import com.eznoel.ezmusicplayer.core.common.formatDuration
 import com.eznoel.ezmusicplayer.core.designsystem.SongCover
 import com.eznoel.ezmusicplayer.core.designsystem.SongOptionsMenu
+import com.eznoel.ezmusicplayer.core.image.rememberCoverColorScheme
 import com.eznoel.ezmusicplayer.core.model.RepeatMode
 import com.eznoel.ezmusicplayer.core.model.Song
 import com.eznoel.ezmusicplayer.navigation.EditTagsRoute
@@ -366,6 +367,7 @@ private fun CoverTopBar(
                     menuExpanded = false
                     onEditTagsClick()
                 },
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
             )
         }
     }

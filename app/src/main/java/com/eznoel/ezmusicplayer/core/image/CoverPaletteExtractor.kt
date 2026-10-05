@@ -51,8 +51,4 @@ class CoverPaletteExtractor @Inject constructor(
         if (seeds != null) cache.put(key, seeds)
         return seeds
     }
-
-    /** Se conserva por compatibilidad con otros usos: solo el color principal. */
-    suspend fun extractColor(song: Song, fallback: Color): Color =
-        extractSeeds(song)?.primary ?: fallback
 }

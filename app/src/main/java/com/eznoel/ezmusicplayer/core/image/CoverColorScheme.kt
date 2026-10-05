@@ -1,4 +1,4 @@
-package com.eznoel.ezmusicplayer.feature.nowplaying
+package com.eznoel.ezmusicplayer.core.image
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -6,15 +6,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import com.eznoel.ezmusicplayer.core.image.CoverSeeds
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 
 /**
- * ColorScheme de la pantalla Now Playing derivado de la carátula, generado con HCT
+ * ColorScheme derivado de la carátula, generado con HCT
  * (material-color-utilities vía MaterialKolor).
  *
  * Solo se sobrescriben los roles que la pantalla realmente usa; el resto queda del tema de la app.
@@ -35,6 +33,7 @@ internal fun rememberCoverColorScheme(seeds: CoverSeeds?): ColorScheme {
         onSurface = target.onSurface.animated("onSurface"),
         onSurfaceVariant = target.onSurfaceVariant.animated("onSurfaceVariant"),
         surfaceContainer = target.surfaceContainer.animated("surfaceContainer"), // fondo del DropdownMenu
+        surfaceContainerHigh = target.surfaceContainerHigh.animated("surfaceContainerHigh"),
         primary = target.primary.animated("primary"),
         onPrimary = target.onPrimary.animated("onPrimary"),
         primaryContainer = target.primaryContainer.animated("primaryContainer"),

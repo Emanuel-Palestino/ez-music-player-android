@@ -1,5 +1,6 @@
 package com.eznoel.ezmusicplayer.feature.miniplayer
 
+import com.eznoel.ezmusicplayer.core.image.CoverSeeds
 import com.eznoel.ezmusicplayer.core.model.Song
 
 data class MiniPlayerUiState(
@@ -8,4 +9,5 @@ data class MiniPlayerUiState(
     val progress: Float,
     val hasNext: Boolean,
     val hasPrevious: Boolean,
+    val coverSeeds: CoverSeeds?,
 )
